@@ -1,122 +1,84 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { useUploadStore, selectUploadSummary } from './state/useUploadStore';
+import { uploadFileAPI } from './api/uploadService'; // קריאה לשירות האמיתי
+import { mockUploadFileAPI } from './api/mockService';
+import { useUploadPolling } from './hooks/useUploadPolling';
+import { FileList } from './components/FileList';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const files = useUploadStore((state) => state.files);
+  const addFiles = useUploadStore((state) => state.addFiles);
+  const updateFile = useUploadStore((state) => state.updateFile);
+  const summary = useUploadStore(useShallow(selectUploadSummary));
+
+  useUploadPolling();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const selectedFiles = Array.from(e.target.files);
+    
+    // 1. Domain Models Creation (Synchronous)
+    const newFiles = selectedFiles.map((file) => ({
+      id: crypto.randomUUID(),
+      originalName: file.name,
+      uploadName: `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`,
+      file,
+      status: 'queued' as const,
+      progress: 0,
+    }));
+
+    // 2. Update UI instantly
+    addFiles(newFiles);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+
+    // 3. Process Uploads asynchronously
+    newFiles.forEach(async (fileObj) => {
+      try {
+        updateFile(fileObj.id, { status: 'uploading', progress: 0 });
+
+        // כאן הקריאה ל-Mock שיצרנו
+        await mockUploadFileAPI(
+          fileObj.file,
+          fileObj.uploadName,
+          (progress) => updateFile(fileObj.id, { progress })
+        );
+
+        // ברגע שההעלאה הסתיימה (100%), אנחנו מעבירים לסטטוס processing.
+        // מכאן, ה-useUploadPolling שכתבנו לוקח פיקוד וממתין לתשובת השרת.
+        updateFile(fileObj.id, { status: 'processing', progress: 100 });
+      } catch (error: any) {
+        updateFile(fileObj.id, { status: 'failed', errorMessage: error.message });
+      }
+    });
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="p-8 font-sans max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Upload Portal - Edge Test</h1>
+      
+      <div className="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg">
+        <input 
+          type="file" 
+          multiple 
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="block w-full text-sm text-gray-500"
+        />
+      </div>
 
-      <div className="ticks"></div>
+      <div className="mb-4 text-sm font-mono bg-gray-100 p-2 rounded">
+        Summary: {JSON.stringify(summary)}
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* File List – refined UI */}
+      <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Uploaded Files</h2>
+        <FileList files={files} />
+      </div>
+    </div>
+  );
 }
-
-export default App
