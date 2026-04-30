@@ -1,4 +1,4 @@
-import type { ServerFileResponse } from '../types';
+import type { ServerFileResponse } from '../../core/types';
 
 // In-memory Database to track files on the "server"
 const serverFilesDB = new Map<string, ServerFileResponse>();

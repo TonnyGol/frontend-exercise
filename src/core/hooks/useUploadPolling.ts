@@ -1,7 +1,7 @@
 // src/hooks/useUploadPolling.ts
 import { useEffect, useRef } from 'react';
 import { useUploadStore } from '../state/useUploadStore';
-import { mockFetchFilesAPI } from '../api/mockService';
+import { mockFetchFilesAPI } from '../../infrastructure/api/mockService';
 
 const POLLING_INTERVAL_MS = 3000;
 
