@@ -1,7 +1,7 @@
 // src/hooks/useUploadPolling.ts
 import { useEffect, useRef } from 'react';
 import { useUploadStore } from '../state/useUploadStore';
-import { mockFetchFilesAPI } from '../../infrastructure/api/mockService';
+import { fetchFilesAPI } from '../../infrastructure/api/uploadService';
 
 const POLLING_INTERVAL_MS = 3000;
 
@@ -24,16 +24,30 @@ export const useUploadPolling = () => {
 
     const intervalId = setInterval(async () => {
       try {
-        console.log('[POLLING] Fetching server status...');
-        const response = await mockFetchFilesAPI();
-        const serverFiles = response.files;
+        // Read fresh state on every tick (avoids stale closure — Gap B fix)
+        const currentFiles = useUploadStore.getState().files;
+        const processingFiles = currentFiles.filter(f => f.status === 'processing');
 
-        // אנחנו מחפשים קבצים שקיימים אצלנו בסטטוס processing
-        // ואצל השרת הם כבר בסטטוס accepted או rejected
+        // Stop condition: no more files to poll for
+        if (processingFiles.length === 0) {
+          console.log('[POLLING] All files finished. Stopping.');
+          clearInterval(intervalId);
+          isPollingRef.current = false;
+          return;
+        }
+
+        console.log('[POLLING] Fetching server status...');
+        const response = await fetchFilesAPI();
+        const serverFiles = response?.files ?? [];
+
+        // Match local processing files against server responses
         const finishedUpdates: { id: string; status: 'accepted' | 'rejected' }[] = [];
 
         processingFiles.forEach((localFile) => {
-          const serverFile = serverFiles.find(sf => sf.filename === localFile.uploadName);
+          // Match by originalName (real server) or uploadName (mock server)
+          const serverFile = serverFiles.find(
+            sf => sf.filename === localFile.originalName || sf.filename === localFile.uploadName
+          );
           
           if (serverFile && (serverFile.status === 'accepted' || serverFile.status === 'rejected')) {
             finishedUpdates.push({
@@ -43,21 +57,10 @@ export const useUploadPolling = () => {
           }
         });
 
-        // אם מצאנו קבצים שסיימו לעבד, נעדכן את ה-Store במכה אחת
+        // Batch update if any files finished processing
         if (finishedUpdates.length > 0) {
           console.log('[POLLING] Found updates:', finishedUpdates);
           updateFilesBatch(finishedUpdates);
-        }
-
-        // תנאי העצירה (Stop Condition): האם עדיין יש קבצים שמעובדים?
-        // אנחנו שולפים מחדש את הסטייט העדכני של ה-Store כדי לבדוק
-        const currentFiles = useUploadStore.getState().files;
-        const stillProcessing = currentFiles.some(f => f.status === 'processing');
-        
-        if (!stillProcessing) {
-          console.log('[POLLING] All files finished. Stopping.');
-          clearInterval(intervalId);
-          isPollingRef.current = false;
         }
 
       } catch (error) {

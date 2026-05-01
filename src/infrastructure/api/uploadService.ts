@@ -1,18 +1,16 @@
 import axios from 'axios';
+import type { ServerFileResponse } from '../../core/types';
 
 export const uploadFileAPI = async (
   file: File,
-  uploadName: string, // ה-Interface דורש את זה, אבל אנחנו לא מעבירים את זה ל-FormData כרגע
+  uploadName: string,
   onProgress: (progress: number) => void,
   signal?: AbortSignal
 ): Promise<void> => {
   const formData = new FormData();
-  
-  // חובה: להעביר את הקובץ נטו. לא מוסיפים פרמטר שלישי של שינוי שם.
   formData.append('file', file);
 
   try {
-    // הפנייה היא יחסית. ה-Proxy של Vite יתפוס אותה ויעביר ל-127.0.0.1:3000
     await axios.post('/upload', formData, {
       signal,
       onUploadProgress: (progressEvent) => {
@@ -33,3 +31,17 @@ export const uploadFileAPI = async (
     throw new Error('Network error during upload');
   }
 };
+
+/**
+ * GET /files — polls the server for file processing status.
+ * Used by useUploadPolling to check if files moved to accepted/rejected.
+ */
+export const fetchFilesAPI = async (): Promise<{ files: ServerFileResponse[] }> => {
+  try {
+    const response = await axios.get<{ files: ServerFileResponse[] }>('/files');
+    return { files: response.data?.files ?? [] };
+  } catch (error) {
+    console.error('[API] Error fetching files:', error);
+    return { files: [] };
+  }
+};

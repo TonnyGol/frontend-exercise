@@ -7,7 +7,7 @@ interface UploadState {
   // Actions
   addFiles: (files: UploadableFile[]) => void;
   updateFile: (id: string, updates: Partial<UploadableFile>) => void;
-  
+  cancelFile: (id: string) => void;
   updateFilesBatch: (updates: { id: string; status: 'accepted' | 'rejected' }[]) => void;
   removeFile: (id: string) => void;
 }
@@ -28,6 +28,20 @@ export const useUploadStore = create<UploadState>((set) => ({
       files: state.files.map((file) =>
         file.id === id ? { ...file, ...updates } : file
       ),
+    }));
+  },
+
+  // 3. Cancel an in-flight upload
+  cancelFile: (id: string) => {
+    set((state) => ({
+      files: state.files.map((file) => {
+        if (file.id === id && (file.status === 'uploading' || file.status === 'queued')) {
+          // Abort the network request if it's in progress
+          file.abortController?.abort();
+          return { ...file, status: 'canceled' as const, progress: 0 };
+        }
+        return file;
+      }),
     }));
   },
 

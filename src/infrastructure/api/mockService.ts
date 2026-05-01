@@ -40,7 +40,7 @@ export const mockUploadFileAPI = async (
           }
         }, processingTime);
       }
-    }, 100);
+    }, 500); // 500ms per step = ~5 seconds total upload time (testable for cancel)
   });
 };
 

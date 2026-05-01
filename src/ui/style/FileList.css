@@ -1,0 +1,142 @@
+@reference "tailwindcss";
+
+.file-list {
+  @apply mt-10;
+}
+
+.file-list__title {
+  @apply text-xl font-semibold mb-4 text-gray-800;
+}
+
+.file-list__item {
+  @apply flex items-center gap-5 p-5 bg-white rounded-xl shadow-sm mb-4 transition-shadow duration-200;
+}
+
+.file-list__item:hover {
+  @apply shadow-lg;
+  transform: scale(1.02);
+}
+
+.file-list__file-icon {
+  @apply w-6 h-6 text-gray-500 flex-shrink-0 transition-colors duration-200;
+}
+
+.file-list__file-icon:hover {
+  @apply text-blue-600;
+}
+
+.file-list__info {
+  @apply flex-1 min-w-0;
+}
+
+.file-list__filename {
+  @apply truncate font-medium text-gray-900;
+}
+
+.file-list__progress-track {
+  @apply w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden;
+}
+
+.file-list__progress-bar {
+  @apply h-full bg-orange-500 rounded-full;
+}
+
+.file-list__error {
+  @apply text-xs text-red-500 mt-1 truncate;
+}
+
+.file-list__status {
+  @apply flex items-center gap-2;
+}
+
+.file-list__status-processing {
+  @apply flex items-center gap-2 text-yellow-600;
+}
+
+.file-list__status-spinner {
+  @apply w-6 h-6 animate-spin;
+}
+
+.file-list__status-text {
+  @apply text-sm font-medium;
+}
+
+.file-list__badge--accepted {
+  @apply inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium;
+}
+
+.file-list__badge--rejected {
+  @apply inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium;
+}
+
+.file-list__badge-icon {
+  @apply w-4 h-4;
+}
+
+.file-list__queued-dot {
+  @apply w-2 h-2 bg-gray-400 rounded-full;
+}
+
+.file-list__progress-text {
+  @apply text-xs font-mono text-gray-600;
+}
+
+.file-list__empty {
+  @apply text-gray-500 text-center py-8;
+}
+
+/* Cancel button */
+.file-list__cancel-btn {
+  @apply flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200 cursor-pointer border-none;
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.file-list__cancel-btn:hover {
+  background-color: #dc2626;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.file-list__cancel-icon {
+  @apply w-4 h-4;
+}
+
+/* Canceled badge */
+.file-list__badge--canceled {
+  @apply inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium;
+}
+
+/* Header and Retry All */
+.file-list__header {
+  @apply relative flex items-center justify-center mb-4 min-h-[36px];
+}
+
+.file-list__header .file-list__title {
+  @apply mb-0 text-center;
+}
+
+.file-list__retry-all-btn {
+  @apply absolute right-0 flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer border-none;
+}
+
+.file-list__retry-all-btn:hover {
+  @apply bg-blue-600 text-white shadow-md;
+}
+
+/* Individual Retry Button */
+.file-list__retry-btn {
+  @apply flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200 cursor-pointer border-none ml-2;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.file-list__retry-btn:hover {
+  background-color: #2563eb;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.file-list__retry-icon {
+  @apply w-4 h-4;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
-import { FileUp } from 'lucide-react';
+import '../style/UploadDropzone.css';
 
 interface UploadDropzoneProps {
   onFilesSelected: (files: File[]) => void;
@@ -15,18 +15,28 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({ onFilesSelected 
   });
 
   return (
-    <div
+    <section
       {...getRootProps()}
-      className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all duration-300 min-h-[250px] flex flex-col justify-center items-center hover:scale-105 ${
-        isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
-      }`}
+      className={`upload-dropzone ${isDragActive ? 'upload-dropzone--active' : ''}`}
     >
       <input {...getInputProps()} />
-      <FileUp className={`w-12 h-12 mx-auto mb-4 ${isDragActive ? 'text-blue-500' : 'text-gray-400'}`} />
-      <p className="text-lg font-medium text-gray-700">
-        {isDragActive ? 'Drop files here...' : 'Drag & drop files here, or click to browse'}
+
+      {/* Folder animation */}
+      <div className="upload-dropzone__folder">
+        {/* Back cover */}
+        <div className="upload-dropzone__back"></div>
+        {/* Paper sheets */}
+        <div className="upload-dropzone__paper upload-dropzone__paper--1"></div>
+        <div className="upload-dropzone__paper upload-dropzone__paper--2"></div>
+        <div className="upload-dropzone__paper upload-dropzone__paper--3"></div>
+        {/* Front cover */}
+        <div className="upload-dropzone__front"></div>
+      </div>
+
+      <p className="upload-dropzone__title">
+        {isDragActive ? 'Drop files here...' : 'Drag & drop files, or click to browse'}
       </p>
-      <p className="text-sm text-gray-500 mt-2">Supports multiple files</p>
-    </div>
+      <p className="upload-dropzone__subtitle">Supports multiple files</p>
+    </section>
   );
 };

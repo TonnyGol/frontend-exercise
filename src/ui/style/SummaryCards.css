@@ -1,0 +1,83 @@
+@reference "tailwindcss";
+
+.summary-grid {
+  @apply grid grid-cols-2 gap-6 mb-8;
+}
+
+@media (min-width: 768px) {
+  .summary-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.summary-card {
+  @apply rounded-xl p-5 flex flex-col items-center shadow-md transition-shadow duration-200;
+}
+
+.summary-card:hover {
+  @apply shadow-xl;
+}
+
+.summary-card--blue {
+  @apply bg-blue-50;
+}
+
+.summary-card--orange {
+  @apply bg-orange-50;
+}
+
+.summary-card--yellow {
+  @apply bg-yellow-50;
+}
+
+.summary-card--green {
+  @apply bg-green-50;
+}
+
+.summary-card--red {
+  @apply bg-red-50;
+}
+
+.summary-card--gray {
+  @apply bg-gray-100;
+}
+
+.summary-card__icon {
+  @apply w-8 h-8 mb-3 transition-all duration-200 cursor-pointer;
+}
+
+.summary-card__icon:hover {
+  @apply scale-110 opacity-80;
+}
+
+.summary-card--blue .summary-card__icon {
+  @apply text-blue-600;
+}
+
+.summary-card--orange .summary-card__icon {
+  @apply text-orange-600;
+}
+
+.summary-card--yellow .summary-card__icon {
+  @apply text-yellow-600;
+}
+
+.summary-card--green .summary-card__icon {
+  @apply text-green-600;
+}
+
+.summary-card--red .summary-card__icon {
+  @apply text-red-600;
+}
+
+.summary-card--gray .summary-card__icon {
+  @apply text-gray-500;
+}
+
+.summary-card__value {
+  @apply text-3xl font-bold;
+}
+
+.summary-card__label {
+  @apply text-sm text-gray-600 mt-1;
+}
