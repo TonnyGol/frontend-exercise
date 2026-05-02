@@ -8,7 +8,7 @@ export const uploadFileAPI = async (
   signal?: AbortSignal
 ): Promise<void> => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('file', file, uploadName);
 
   try {
     await axios.post('/upload', formData, {

@@ -11,9 +11,8 @@ export const mockUploadFileAPI = async (
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     let progress = 0;
-    
+
     const interval = setInterval(() => {
-      // תמיכה בביטול העלאה (AbortController) שנוסיף בהמשך
       if (signal?.aborted) {
         clearInterval(interval);
         return reject(new Error('CANCELED'));
@@ -24,17 +23,17 @@ export const mockUploadFileAPI = async (
 
       if (progress >= 100) {
         clearInterval(interval);
-        
-        // העלאה הסתיימה - סטטוס עיבוד
+
+        // Upload finished - processing status
         serverFilesDB.set(uploadName, { filename: uploadName, status: 'processing' });
         resolve();
 
-        // סימולציה של זמן עיבוד בשרת (5 עד 30 שניות לטובת נוחות הפיתוח)
+        // Simulation of server processing time (5 to 30 seconds for development convenience)
         const processingTime = Math.floor(Math.random() * 30000) + 5000;
-        
+
         setTimeout(() => {
           if (serverFilesDB.has(uploadName)) {
-            // 80% הצלחה, 20% כישלון
+            // 80% success, 20% failure
             const finalStatus = Math.random() > 0.2 ? 'accepted' : 'rejected';
             serverFilesDB.set(uploadName, { filename: uploadName, status: finalStatus });
           }

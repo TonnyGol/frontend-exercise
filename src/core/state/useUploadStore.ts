@@ -3,7 +3,7 @@ import type { UploadableFile, UploadSummary } from '../types';
 
 interface UploadState {
   files: UploadableFile[];
-  
+
   // Actions
   addFiles: (files: UploadableFile[]) => void;
   updateFile: (id: string, updates: Partial<UploadableFile>) => void;
@@ -46,9 +46,9 @@ export const useUploadStore = create<UploadState>((set) => ({
   },
 
   updateFilesBatch: (updates) => set((state) => {
-    // יוצרים מילון גישה מהירה (O(1) Lookup)
+    // Creating a fast lookup map (O(1) Lookup)
     const updatesMap = new Map(updates.map(u => [u.id, u.status]));
-    
+
     return {
       files: state.files.map((file) => {
         if (updatesMap.has(file.id)) {

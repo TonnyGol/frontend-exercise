@@ -8,15 +8,14 @@ const POLLING_INTERVAL_MS = 3000;
 export const useUploadPolling = () => {
   const files = useUploadStore((state) => state.files);
   const updateFilesBatch = useUploadStore((state) => state.updateFilesBatch);
-  
-  // נשמור Reference כדי שלא נריץ כמה פולינגים במקביל
+
+  // For not running multiple polling same time save reference
   const isPollingRef = useRef(false);
 
   useEffect(() => {
-    // בדוק אם יש קבצים שדורשים תשאול השרת
     const processingFiles = files.filter(f => f.status === 'processing');
-    
-    // אם אין, או שאנחנו כבר רצים, אל תעשה כלום
+
+    // If no file to poll or already polling, do nothing
     if (processingFiles.length === 0 || isPollingRef.current) return;
 
     isPollingRef.current = true;
@@ -24,7 +23,7 @@ export const useUploadPolling = () => {
 
     const intervalId = setInterval(async () => {
       try {
-        // Read fresh state on every tick (avoids stale closure — Gap B fix)
+        // Read fresh state on every tick 
         const currentFiles = useUploadStore.getState().files;
         const processingFiles = currentFiles.filter(f => f.status === 'processing');
 
@@ -48,7 +47,7 @@ export const useUploadPolling = () => {
           const serverFile = serverFiles.find(
             sf => sf.filename === localFile.originalName || sf.filename === localFile.uploadName
           );
-          
+
           if (serverFile && (serverFile.status === 'accepted' || serverFile.status === 'rejected')) {
             finishedUpdates.push({
               id: localFile.id,
@@ -68,7 +67,7 @@ export const useUploadPolling = () => {
       }
     }, POLLING_INTERVAL_MS);
 
-    // Cleanup function: למקרה שהקומפוננטה תעשה Unmount לפני שכל הקבצים סיימו
+    // Cleanup function: if component unmount before all files finished
     return () => {
       if (isPollingRef.current) {
         console.log('[POLLING] Cleanup triggered (Unmount).');
@@ -76,5 +75,5 @@ export const useUploadPolling = () => {
         isPollingRef.current = false;
       }
     };
-  }, [files, updateFilesBatch]); // ה-Effect ירוץ מחדש כשמערך הקבצים משתנה
+  }, [files, updateFilesBatch]);
 };
