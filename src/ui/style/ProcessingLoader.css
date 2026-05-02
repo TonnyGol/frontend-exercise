@@ -1,0 +1,97 @@
+.bad-snail-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bad-snail-loader .iconLoaderProgress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-name: rotateLoader;
+  margin: 0;
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+.bad-snail-loader .iconLoaderProgress svg {
+  stroke-width: 24px; /* Slightly thicker since we scale down a lot */
+  fill: none;
+  transform-origin: center;
+  z-index: 10;
+}
+
+.bad-snail-loader .iconLoaderProgressFirst circle,
+.bad-snail-loader .iconLoaderProgressSecond circle,
+.bad-snail-loader .iconLoaderProgressFirst,
+.bad-snail-loader .iconLoaderProgressSecond {
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.bad-snail-loader .iconLoaderProgressFirst circle,
+.bad-snail-loader .iconLoaderProgressSecond circle {
+  animation-duration: 3s;
+}
+
+.bad-snail-loader .iconLoaderProgressFirst,
+.bad-snail-loader .iconLoaderProgressSecond {
+  position: absolute;
+  animation-duration: 6s;
+}
+
+.bad-snail-loader .iconLoaderProgressFirst circle {
+  animation-name: circleFirst;
+  stroke-dasharray: 628, 628;
+  stroke-dashoffset: 0;
+  stroke: #7c57f4;
+  stroke-linecap: round;
+}
+
+.bad-snail-loader .iconLoaderProgressSecond {
+  transform: rotate(-14deg);
+}
+
+.bad-snail-loader .iconLoaderProgressSecond circle {
+  animation-name: circleSecond;
+  stroke-dasharray: 628, 628;
+  stroke-dashoffset: 0;
+  stroke: #bfb2f7;
+  stroke-linecap: round;
+}
+
+@keyframes circleFirst {
+  from,
+  to {
+    stroke-dashoffset: 50;
+  }
+
+  50% {
+    stroke-dashoffset: 625;
+  }
+}
+
+@keyframes circleSecond {
+  from,
+  to {
+    stroke-dashoffset: -625;
+  }
+
+  50% {
+    stroke-dashoffset: -50;
+  }
+}
+
+@keyframes rotateLoader {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

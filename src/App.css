@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
 .app-wrapper {
-  @apply min-h-screen bg-gray-50 p-8 font-sans;
+  @apply min-h-screen bg-[#434658] p-8 font-sans;
 }
 
 .app-container {
@@ -10,7 +10,7 @@
 
 .app-title {
   @apply text-3xl font-bold mb-8;
-  color: #e11d48;
+  color: #38bdf8;
 }
 
 .app-summary-section {
@@ -45,18 +45,51 @@
   height: 100%;
 }
 
-.shape-1 { width: 300px; height: 300px; left: 10%; bottom: -300px; animation-duration: 25s; animation-delay: 0s; }
-.shape-2 { width: 200px; height: 200px; left: 45%; bottom: -200px; animation-duration: 18s; animation-delay: -5s; }
-.shape-3 { width: 400px; height: 400px; left: 75%; bottom: -400px; animation-duration: 32s; animation-delay: -12s; }
-.shape-4 { width: 150px; height: 150px; left: 85%; bottom: -150px; animation-duration: 15s; animation-delay: -8s; }
+.shape-1 {
+  width: 300px;
+  height: 300px;
+  left: 10%;
+  bottom: -300px;
+  animation-duration: 25s;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 200px;
+  height: 200px;
+  left: 45%;
+  bottom: -200px;
+  animation-duration: 18s;
+  animation-delay: -5s;
+}
+
+.shape-3 {
+  width: 400px;
+  height: 400px;
+  left: 75%;
+  bottom: -400px;
+  animation-duration: 32s;
+  animation-delay: -12s;
+}
+
+.shape-4 {
+  width: 150px;
+  height: 150px;
+  left: 85%;
+  bottom: -150px;
+  animation-duration: 15s;
+  animation-delay: -8s;
+}
 
 @keyframes floatUp {
   0% {
     transform: translateY(0) rotate(0deg) scale(1);
   }
+
   50% {
     transform: translateY(-50vh) rotate(10deg) scale(1.1);
   }
+
   100% {
     transform: translateY(-110vh) rotate(-5deg) scale(1);
   }

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, Loader2, FileText, Image, File, X, Ban, RefreshCw } from 'lucide-react';
-import type { UploadableFile } from '../../core/types';
+import { CheckCircle, XCircle, FileText, Image, File, X, Ban, RefreshCw, Filter, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { ProcessingLoader } from './ProcessingLoader';
+import type { UploadableFile, ClientFileStatus } from '../../core/types';
 import '../style/FileList.css';
 
 interface FileListProps {
@@ -11,6 +12,31 @@ interface FileListProps {
   onRetryAll: () => void;
 }
 
+type StatusFilter = 'all' | ClientFileStatus;
+type SortField = 'name' | 'status';
+type SortDirection = 'asc' | 'desc';
+
+const STATUS_ORDER: Record<ClientFileStatus, number> = {
+  uploading: 0,
+  queued: 1,
+  processing: 2,
+  accepted: 3,
+  rejected: 4,
+  failed: 5,
+  canceled: 6,
+};
+
+const STATUS_LABELS: Record<StatusFilter, string> = {
+  all: 'All Statuses',
+  queued: 'Queued',
+  uploading: 'Uploading',
+  processing: 'Processing',
+  accepted: 'Accepted',
+  rejected: 'Rejected',
+  failed: 'Failed',
+  canceled: 'Canceled',
+};
+
 const getFileIcon = (filename: string) => {
   const ext = filename.split('.').pop()?.toLowerCase();
   if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext || '')) return Image;
@@ -19,7 +45,44 @@ const getFileIcon = (filename: string) => {
 };
 
 export const FileList: React.FC<FileListProps> = ({ files, onCancelFile, onRetryFile, onRetryAll }) => {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
   const hasFailedFiles = files.some(f => ['failed', 'canceled'].includes(f.status));
+
+  const filteredAndSorted = useMemo(() => {
+    let result = [...files];
+
+    // Filter
+    if (statusFilter !== 'all') {
+      result = result.filter(f => f.status === statusFilter);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      let cmp = 0;
+      if (sortField === 'name') {
+        cmp = a.originalName.localeCompare(b.originalName, undefined, { sensitivity: 'base' });
+      } else {
+        cmp = STATUS_ORDER[a.status] - STATUS_ORDER[b.status];
+      }
+      return sortDirection === 'asc' ? cmp : -cmp;
+    });
+
+    return result;
+  }, [files, statusFilter, sortField, sortDirection]);
+
+  const handleSortToggle = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = sortDirection === 'asc' ? ChevronUp : ChevronDown;
 
   return (
     <div className="file-list">
@@ -32,8 +95,52 @@ export const FileList: React.FC<FileListProps> = ({ files, onCancelFile, onRetry
           </button>
         )}
       </div>
+
+      {/* Filter & Sort Controls */}
+      {files.length > 0 && (
+        <div className="file-list__controls">
+          <div className="file-list__filter">
+            <Filter className="file-list__control-icon" size={14} />
+            <select
+              id="status-filter"
+              className="file-list__select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+            >
+              {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="file-list__sort-group">
+            <ArrowUpDown className="file-list__control-icon" size={14} />
+            <button
+              className={`file-list__sort-btn ${sortField === 'name' ? 'file-list__sort-btn--active' : ''}`}
+              onClick={() => handleSortToggle('name')}
+            >
+              Name
+              {sortField === 'name' && <SortIcon size={12} />}
+            </button>
+            <button
+              className={`file-list__sort-btn ${sortField === 'status' ? 'file-list__sort-btn--active' : ''}`}
+              onClick={() => handleSortToggle('status')}
+            >
+              Status
+              {sortField === 'status' && <SortIcon size={12} />}
+            </button>
+          </div>
+
+          {statusFilter !== 'all' && (
+            <span className="file-list__result-count">
+              {filteredAndSorted.length} of {files.length} files
+            </span>
+          )}
+        </div>
+      )}
+
       <AnimatePresence>
-        {files.map((file) => {
+        {filteredAndSorted.map((file) => {
           const Icon = getFileIcon(file.originalName);
           const isCancelable = file.status === 'uploading' || file.status === 'queued';
           const isRetryable = file.status === 'failed' || file.status === 'canceled';
@@ -66,7 +173,7 @@ export const FileList: React.FC<FileListProps> = ({ files, onCancelFile, onRetry
               <div className="file-list__status">
                 {file.status === 'processing' && (
                   <div className="file-list__status-processing">
-                    <Loader2 className="file-list__status-spinner" />
+                    <ProcessingLoader />
                     <span className="file-list__status-text">Processing</span>
                   </div>
                 )}
@@ -122,6 +229,9 @@ export const FileList: React.FC<FileListProps> = ({ files, onCancelFile, onRetry
       </AnimatePresence>
       {files.length === 0 && (
         <p className="file-list__empty">No files uploaded yet.</p>
+      )}
+      {files.length > 0 && filteredAndSorted.length === 0 && (
+        <p className="file-list__empty">No files match the selected filter.</p>
       )}
     </div>
   );

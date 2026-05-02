@@ -5,11 +5,12 @@
 }
 
 .file-list__title {
-  @apply text-xl font-semibold mb-4 text-gray-800;
+  @apply text-xl font-semibold mb-4 text-slate-200;
 }
 
 .file-list__item {
-  @apply flex items-center gap-5 p-5 bg-white rounded-xl shadow-sm mb-4 transition-shadow duration-200;
+  @apply grid items-center gap-5 p-5 bg-white rounded-xl shadow-sm mb-4 transition-shadow duration-200;
+  grid-template-columns: 1fr 2fr 1fr;
 }
 
 .file-list__item:hover {
@@ -18,7 +19,7 @@
 }
 
 .file-list__file-icon {
-  @apply w-6 h-6 text-gray-500 flex-shrink-0 transition-colors duration-200;
+  @apply w-6 h-6 text-gray-500 transition-colors duration-200 justify-self-start;
 }
 
 .file-list__file-icon:hover {
@@ -26,11 +27,11 @@
 }
 
 .file-list__info {
-  @apply flex-1 min-w-0;
+  @apply min-w-0;
 }
 
 .file-list__filename {
-  @apply truncate font-medium text-gray-900;
+  @apply truncate font-medium text-gray-900 text-center;
 }
 
 .file-list__progress-track {
@@ -46,7 +47,7 @@
 }
 
 .file-list__status {
-  @apply flex items-center gap-2;
+  @apply flex items-center justify-end gap-2;
 }
 
 .file-list__status-processing {
@@ -82,7 +83,7 @@
 }
 
 .file-list__empty {
-  @apply text-gray-500 text-center py-8;
+  @apply text-gray-400 text-center py-8;
 }
 
 /* Cancel button */
@@ -126,7 +127,7 @@
 
 /* Individual Retry Button */
 .file-list__retry-btn {
-  @apply flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200 cursor-pointer border-none ml-2;
+  @apply flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer border-none ml-2 text-sm font-medium;
   background-color: #eff6ff;
   color: #2563eb;
 }
@@ -139,4 +140,57 @@
 
 .file-list__retry-icon {
   @apply w-4 h-4;
+}
+
+/* ─── Filter & Sort Controls ─── */
+.file-list__controls {
+  @apply flex flex-wrap items-center gap-3 mb-5 p-3 rounded-xl;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.file-list__filter {
+  @apply flex items-center gap-2;
+}
+
+.file-list__control-icon {
+  @apply text-gray-400 flex-shrink-0;
+}
+
+.file-list__select {
+  @apply text-sm font-medium text-gray-700 bg-white rounded-lg px-3 py-1.5 border border-gray-200 cursor-pointer transition-all duration-200;
+  appearance: auto;
+}
+
+.file-list__select:hover {
+  @apply border-blue-300 shadow-sm;
+}
+
+.file-list__select:focus {
+  @apply border-blue-400 outline-none ring-2 ring-blue-100;
+}
+
+.file-list__sort-group {
+  @apply flex items-center gap-1.5 ml-auto;
+}
+
+.file-list__sort-btn {
+  @apply flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 cursor-pointer transition-all duration-200;
+}
+
+.file-list__sort-btn:hover {
+  @apply text-gray-700 border-gray-300 shadow-sm;
+}
+
+.file-list__sort-btn--active {
+  @apply text-blue-600 bg-blue-50 border-blue-200;
+}
+
+.file-list__sort-btn--active:hover {
+  @apply bg-blue-100 border-blue-300;
+}
+
+.file-list__result-count {
+  @apply text-xs font-medium text-gray-400 tabular-nums;
 }
