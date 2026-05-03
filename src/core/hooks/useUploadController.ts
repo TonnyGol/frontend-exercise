@@ -45,6 +45,24 @@ export const useUploadController = () => {
     }
   };
 
+  const getFormattedTimestamp = () => {
+    const now = new Date();
+    
+    const year = now.getFullYear();
+    
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const day = String(now.getDate()).padStart(2, '0');
+    
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    // Return formatted timestamp: 2024-10-27_14-30-05
+    return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+  };
+
+  
+
   const onFilesSelected = async (selectedFiles: File[]) => {
     if (selectedFiles.length === 0) return;
 
@@ -54,7 +72,7 @@ export const useUploadController = () => {
       return {
         id: crypto.randomUUID(),
         originalName: file.name,
-        uploadName: `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`,
+        uploadName: `${getFormattedTimestamp()}_${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`,
         file,
         status: 'queued' as const,
         progress: 0,
